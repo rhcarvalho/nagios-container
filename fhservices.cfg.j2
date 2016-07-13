@@ -16,16 +16,16 @@ define command {
 }
 
 define contact {
-       contact_name   mbaasadmin
+       contact_name   rhmapadmin
        use            generic-contact
-       alias          MBaaS Admin
-       email          {{ mbaas_admin_email }}
+       alias          RHMAP Admin
+       email          {{ rhmap_admin_email }}
 }
 
 define contactgroup {
-       contactgroup_name  mbaasadmins
-       alias              MBaaS Administrators
-       members            mbaasadmin
+       contactgroup_name  rhmapadmins
+       alias              RHMAP Administrators
+       members            rhmapadmin
 }
 
 # Host template
@@ -40,37 +40,37 @@ define host {
   notification_period     workhours
   notification_interval   120
   notification_options    d,u,r
-  contact_groups          mbaasadmins
+  contact_groups          rhmapadmins
   register                0
 }
 
 # This is a dummy host really, just so the host doesn't go red
 define host {
        use fh-component-container
-       address {{ mbaas_router_dns }}
-       host_name {{ mbaas_router_dns }}
+       address {{ rhmap_router_dns }}
+       host_name {{ rhmap_router_dns }}
 }
 
 {% for fhservice in fh_services_ping %}
 define service {
        service_description {{ fhservice }}::Ping
-       hosts {{ mbaas_router_dns }}
+       hosts {{ rhmap_router_dns }}
        check_command check_fh_component_http_ping!{{ fhservice }}-service
        use generic-service
 
        notes This server cannot access {{ fhservice }}, check it is running and that this server is able to talk to it on port 8080
-       contact_groups mbaasadmins
+       contact_groups rhmapadmins
 }
 {% endfor %}
 
 {% for fhservice in fh_services_health %}
 define service {
        service_description {{ fhservice }}::Health
-       hosts {{ mbaas_router_dns }}
+       hosts {{ rhmap_router_dns }}
        check_command check_fh_component_http_health!{{ fhservice }}-service
        use generic-service
 
        notes This server failed to get a successful response from the {{ fhservice }} health endpoint. Check the response code & body and ensure the service and its dependencies are running and configured correctly.
-       contact_groups mbaasadmins
+       contact_groups rhmapadmins
 }
 {% endfor %}
