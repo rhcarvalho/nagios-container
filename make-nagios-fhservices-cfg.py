@@ -19,8 +19,8 @@ template_dirname = os.path.dirname(template_file)
 j2env = Environment(loader=FileSystemLoader(template_dirname), trim_blocks=True)
 j2template = j2env.get_template(template_basename)
 
-j2renderedouput = j2template.render(fh_services_ping = fh_services_ping,
-                                    fh_services_health = fh_services_health,
+j2renderedouput = j2template.render(fh_services_ping=fh_services_ping,
+                                    fh_services_health=fh_services_health,
                                     rhmap_router_dns=rhmap_router_dns,
                                     rhmap_admin_email=rhmap_admin_email)
 

@@ -1,17 +1,16 @@
 #!/usr/bin/bash
 
-# Add nagios dirs
-mkdir -p /var/log/nagios/archives \
-      /var/log/nagios/rw \
-      /var/log/nagios/spool/checkresults
+set -o errexit
+set -o nounset
+set -o pipefail
 
 # Add nagios user
 htpasswd -c -b -s /etc/nagios/passwd ${NAGIOS_USER} ${NAGIOS_PASSWORD}
 
 # Generate command config
-python /opt/rhmap/make-nagios-commands-cfg.py
+/opt/rhmap/make-nagios-commands-cfg.py
 
 # Generate fhservices config
-python /opt/rhmap/make-nagios-fhservices-cfg.py
+/opt/rhmap/make-nagios-fhservices-cfg.py
 
-/usr/bin/supervisord
+exec /usr/bin/supervisord -c /etc/supervisord.conf
