@@ -22,7 +22,7 @@ RUN yum install -y epel-release && \
     sed -i -e 's|cfg_file=/etc/nagios/objects/localhost.cfg||' /etc/nagios/nagios.cfg
 
 ADD supervisord.conf /etc/supervisord.conf
-ADD make-nagios-fhservices-cfg.py make-nagios-commands-cfg.py fhservices.cfg.j2 commands.cfg.j2 /opt/rhmap/
-ADD start.sh /start.sh
+ADD make-nagios-fhservices-cfg make-nagios-commands-cfg fhservices.cfg.j2 commands.cfg.j2 /opt/rhmap/
+ADD start /start
 
-CMD ["/start.sh"]
+CMD ["/start"]
