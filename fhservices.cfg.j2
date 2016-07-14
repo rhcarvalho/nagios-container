@@ -32,6 +32,11 @@ define command {
   command_line   /opt/rhmap/nagios/plugins/disk-usage -w $ARG1$ -c $ARG2$
 }
 
+define command {
+  command_name   check_mongodb
+  command_line   /opt/rhmap/nagios/plugins/mongodb-health -s $ARG1$
+}
+
 define contact {
        contact_name   rhmapadmin
        use            generic-contact
@@ -121,10 +126,18 @@ define service {
 
 define service {
        service_description Storage::Pod::Disk Usage
-       hosts {{ rhmap_router_dns }}
        check_command check_pod_disk_usage!80!90
        use generic-service
-
+       hostgroup_name core,mbaas
        notes One or more pods have volumes which are running out of disk.  You should clean up the files on this pod, if possible, or scale down/up the pod so that it has a fresh filesystem.
+       contact_groups rhmapadmins
+}
+
+define service {
+       service_description Database::MongoDB::Health
+       check_command check_mongodb!mongodb-service-1
+       use generic-service
+       hostgroup_name core,mbaas
+       notes The mongodb replica set may not be functioning properly.  There should be one and only one primary member and zero or more secondary members
        contact_groups rhmapadmins
 }
