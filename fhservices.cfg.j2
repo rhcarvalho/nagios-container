@@ -55,7 +55,7 @@ define host {
 define service {
        service_description {{ fhservice }}::Ping
        hosts {{ rhmap_router_dns }}
-       check_command check_fh_component_http_ping!{{ fhservice }}-service
+       check_command check_fh_component_http_ping!{{ fhservice }}
        use generic-service
 
        notes This server cannot access {{ fhservice }}, check it is running and that this server is able to talk to it on port 8080
@@ -67,7 +67,7 @@ define service {
 define service {
        service_description {{ fhservice }}::Health
        hosts {{ rhmap_router_dns }}
-       check_command check_fh_component_http_health!{{ fhservice }}-service
+       check_command check_fh_component_http_health!{{ fhservice }}
        use generic-service
 
        notes This server failed to get a successful response from the {{ fhservice }} health endpoint. Check the response code & body and ensure the service and its dependencies are running and configured correctly.

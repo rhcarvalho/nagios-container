@@ -1,3 +1,3 @@
-# RHMAP Nagios3 for Docker
+# RHMAP Nagios for Docker
 
-Nagios3 server in a Docker container for RHMAP.
+Nagios server in a Docker container for RHMAP.
