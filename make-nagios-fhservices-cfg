@@ -4,8 +4,8 @@ import os
 
 from jinja2 import Environment, FileSystemLoader, Template
 
-fh_services_ping = ['fh-messaging', 'fh-metrics']
-fh_services_health = ['fh-messaging', 'fh-metrics']
+fh_services_ping = ['fh-messaging', 'fh-metrics', 'fh-ngui', 'fh-supercore', 'fh-aaa', 'fh-appstore']
+fh_services_health = ['fh-messaging', 'fh-metrics', 'fh-ngui', 'fh-supercore', 'fh-aaa', 'fh-appstore']
 
 rhmap_admin_email = os.getenv('RHMAP_ADMIN_EMAIL', 'root@localhost')
 rhmap_router_dns = os.getenv('RHMAP_ROUTER_DNS', 'rhmap.localhost')
