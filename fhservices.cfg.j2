@@ -7,7 +7,7 @@ define command {
 # Check that a component responds to a /sys/info/health over HTTP
 define command {
        command_name   check_fh_component_http_health
-       command_line   $USER1$/check_http -H $ARG1$ -u /sys/info/health -p 8080
+       command_line   /opt/rhmap/nagios/plugins/fh-check-component-health.sh $ARG1$ 8080
 }
 
 define command {
