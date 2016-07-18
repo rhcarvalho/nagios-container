@@ -1,0 +1,25 @@
+sudo: required
+language: bash
+services:
+- docker
+branches:
+  only:
+  - travistest
+env:
+  global:
+  - secure: G6KnhKEmuUW5fmlaGIjHQTrM3ht4vvybqTAiwjYVFZHkHjNWvMhKDFADtFVSGKxs3HnEb98V94T33VX4S9cvZa2LCBih5cWW1x4ZyMvmIqEDgkgjeoBY6VkK3bV4AFQENJhVqiJNG72fEiGeqDpgIBM1K1EV6hpfYBhl5wEQnmY+JtsiEZDsxLPq65a6cW7rCaEUztDEV0QuoqHsPWM230Xjn6XHAw0lWlKSR2aCyj6rRSBg7VgP0nE2x9v3nil8EcwPqYQbOPs7m75snuB2nfJ0+9rZMXgC20ZdtS7Di5DoOtWnN5PsIt5oOP+J0GhDiz0/ztxcdm9SGwkWgIGM5gyqlNFFXc5iFyKLF/tOfSJljRO4NNw8yamq0XCeDYIYT1bcM7ieCWstLwMpTq4iaIapesy8i5sBeb6heMY9Ns6+f1YFw9WuwByJ4du+9EjB+u5h/ojhJmSjE+tFiXop17Yp/bb/jBJ4zWg7BDYIRNkwdJxfEHZ278ax6fcHBr1ywN9UoCTr5DdnPJvKwPWfzpVf07qX66lJC1OqmWSQLE4KxTGZwdRG/279XDu7ewuPr1aWTmz2NveuKiWna6ZD8VTwimg72BZLvbx1iYuefwbcWxUfCZE+52m42+RQUhqfsoyH/cdbsLUiPUQuiNaj9UCOpIIL/mIW53kmsmPFkC4=
+  - secure: oilobjWjadzea4SN31oBeJB73M9ZMX4ftoLx8YrXQVWDfyvfmVZS8F4t+VDUJ3jyrptIvMwSOmfti7F85Ilv1MI6hCDwv865l2W+T//o5m9eo/Bwv3do8SJ9P0LA8a+BQKyW+3o5mktGMbNOq15O2LdwT6hLkxIn/Xdu8pE3GnYfHbohao8lrXd8Y4snfTX7AJIbGiPcKr55ClFR0VBzHFM6DsHzS5G/uBcjNPc5zvQJZkT37WI7a5McH8U58v9v54HrdfMyxHFcA5BZIt/rVudC4QqoqBcDIPJNH7eGmD8EGktYEAA9/Spuen7ZtdawITvLhQpWuX4DEz68L/JpxV6mCNYiOrWtupp/DsqjDnLu3ipSWhR2jzGEbEVJ3meWoIewqfcLYU/RdxmK/t3ANI+SBBqkGbnwU4ylIF16HpFueptHp3+1S2/gZ6+ayJ08FeAPQ6bpA3ftiytOQOZkGwKA45zFYBJwoebBJYDKtrzOMEpji9qd2GZhkOcDfe9XDs1R0xHQClQkWNAwnoDvhCzNNeGjlYZAsQasfPDesVhA1tfdas74+3lVul/e1PBMRDmsyle4AUD1ExLUi6d0ukUpoZOxlsHc2V0Ij+ZaMPH97Z/c1/51hNF2ItKUppeSxDYLnIteEt4SoJLv+80fPmYnIwxqhC1JeWMJKMwsoXs=
+  - secure: QCkn3hX6htJN/VQyXtwVYmTmpt6GG1bEQqsCMT9GE5yKaM3dhBI9/CsbYoymd0XB74MZ0ZiKOQE64nFAkqupXX/SYxKICvzwUARjX9LjkLHfKEc08SxG1Vwk+1Vk4LvNpJ8Hvbf8i+owZcZkkNX46u+9aWS4VYzJuQzR130jzDsMF8GvB3il5UBhxXTbw5p8fNk39VhEEPbDr2UCamdkNzKGo8aiTvB8wxYO+a0Vzg6VS+OvnSwY4sbTzPDAfug+dYPwNE9KoPdomJTc0JomWcqhWYVtTFd5Aw5bIDo6qfqEbgxchOainLZ6D7kq3aTAbgONBRJDs/7vKJc1TDhQWKRw4/41BueP/uQUpJurlxHJeEhY5W0kta/t4O9kzzixC9DndPbN0cORH+cFejwrcDcuGoOluo1cuJLdNBNQIS8Vfbg5B/EGbXAUw+5IAfG+QFc7hwljzdp7hRMlyC9/JVfD5cHbv/p1hMWBECLA3TEKJkpcUBc7A8TAvdEqNRdHvVxVh6qW8SjAQ4bEYqZNOL9rcfCqUKChk4P2VUj4EcdsjG10eeF7BA1cGZd5uDuvZdiQbAg7iPomApERwT2jOuoawxNH7E+FibcbWETeroe5JJIPaM5SlbCC9WIOBAstCj16s9MjJVE/GUrR1Ukhpvkf1DSrApkyGYZOPHTgWkg=
+before_install:
+- export DOCKER_REGISTRY=https://index.docker.io/v1/
+- docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USER" -p="$DOCKER_PASSWORD"  "$DOCKER_REGISTRY"
+- export REPO=docker.io/rhmap/nagios4
+- export VERSION=4.0.8
+- docker build -f Dockerfile -t "$REPO:$VERSION-$TRAVIS_BUILD_NUMBER" .
+after_success:
+- export TAG=latest
+- docker tag "$REPO:$VERSION-$TRAVIS_BUILD_NUMBER" $REPO:$TAG
+- docker push "$REPO:$VERSION-$TRAVIS_BUILD_NUMBER"
+- docker push $REPO:$TAG
+- docker rmi "$REPO:$VERSION-$TRAVIS_BUILD_NUMBER"
+- docker rmi $REPO:$TAG
