@@ -10,7 +10,8 @@ fh_services = [
     {'name': 'fh-ngui', 'checks': ['ping', 'health']},
     {'name': 'fh-supercore', 'checks': ['ping', 'health']},
     {'name': 'fh-aaa', 'checks': ['ping', 'health']},
-    {'name': 'fh-appstore', 'checks': ['ping', 'health']}
+    {'name': 'fh-appstore', 'checks': ['ping', 'health']},
+    {'name': 'millicore', 'checks': ['health'], 'health_endpoint': '/box/api/health'}
 ]
 
 rhmap_admin_email = os.getenv('RHMAP_ADMIN_EMAIL', 'root@localhost')
