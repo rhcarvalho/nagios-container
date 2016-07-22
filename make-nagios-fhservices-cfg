@@ -4,8 +4,14 @@ import os
 
 from jinja2 import Environment, FileSystemLoader, Template
 
-fh_services_ping = ['fh-messaging', 'fh-metrics', 'fh-ngui', 'fh-supercore', 'fh-aaa', 'fh-appstore']
-fh_services_health = ['fh-messaging', 'fh-metrics', 'fh-ngui', 'fh-supercore', 'fh-aaa', 'fh-appstore']
+fh_services = [
+    {'name': 'fh-messaging', 'checks': ['ping', 'health']},
+    {'name': 'fh-metrics', 'checks': ['ping', 'health']},
+    {'name': 'fh-ngui', 'checks': ['ping', 'health']},
+    {'name': 'fh-supercore', 'checks': ['ping', 'health']},
+    {'name': 'fh-aaa', 'checks': ['ping', 'health']},
+    {'name': 'fh-appstore', 'checks': ['ping', 'health']}
+]
 
 rhmap_admin_email = os.getenv('RHMAP_ADMIN_EMAIL', 'root@localhost')
 rhmap_router_dns = os.getenv('RHMAP_ROUTER_DNS', 'rhmap.localhost')
@@ -19,8 +25,7 @@ template_dirname = os.path.dirname(template_file)
 j2env = Environment(loader=FileSystemLoader(template_dirname), trim_blocks=True)
 j2template = j2env.get_template(template_basename)
 
-j2renderedouput = j2template.render(fh_services_ping=fh_services_ping,
-                                    fh_services_health=fh_services_health,
+j2renderedouput = j2template.render(fh_services=fh_services,
                                     rhmap_router_dns=rhmap_router_dns,
                                     rhmap_admin_email=rhmap_admin_email)
 
