@@ -19,12 +19,15 @@ def parse_df(line):
         return ()
     return (mo.group(1), int(mo.group(2)), int(mo.group(3)))
 
+
 def analize(pcent, ipcent, warning_threshold, critical_threshold):
     max_pcent = max(pcent, ipcent)
     return max_pcent >= warning_threshold, max_pcent >= critical_threshold
 
+
 def report():
     raise NotImplementedError("report is not implemented yet")
+
 
 def main():
     project = oc("project", "-q")
