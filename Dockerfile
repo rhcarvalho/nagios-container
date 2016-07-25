@@ -5,7 +5,7 @@ EXPOSE 8080
 ADD sendEmail-epel-7.repo /etc/yum.repos.d/
 
 RUN yum install -y epel-release && \
-    INSTALL_PKGS="httpd nagios telnet supervisor python-jinja2 nagios-plugins-all sendEmail perl-Net-SSLeay perl-IO-Socket-SSL jq" && \
+    INSTALL_PKGS="httpd nagios telnet supervisor python-jinja2 nagios-plugins-all sendEmail perl-Net-SSLeay perl-IO-Socket-SSL" && \
     yum -y --setopt=tsflags=nodocs install $INSTALL_PKGS && \
     rpm -V $INSTALL_PKGS && \
     yum clean all && \
