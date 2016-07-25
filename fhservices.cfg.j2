@@ -6,8 +6,8 @@ define command {
 
 # Check that a component responds to a /sys/info/health over HTTP
 define command {
-       command_name   check_fh_component_http_health
-       command_line   /opt/rhmap/nagios/plugins/fh-check-component-health -H $ARG1$ -P 8080
+       command_name   check_fh_component_health
+       command_line   /opt/rhmap/nagios/plugins/fh-check-component-health -H $ARG1$ -P $ARG2$ -E $ARG3$
 }
 
 # Check for valid response from Memcached
@@ -57,26 +57,26 @@ define host {
        host_name {{ rhmap_router_dns }}
 }
 
-{% for fhservice in fh_services_ping %}
+{% for fhservice in fh_services if 'ping' in fhservice['checks'] %}
 define service {
-       service_description {{ fhservice }}::Ping
+       service_description {{ fhservice['name']}}::Ping
        hosts {{ rhmap_router_dns }}
-       check_command check_fh_component_http_ping!{{ fhservice }}
+       check_command check_fh_component_http_ping!{{ fhservice['name'] }}!{{ fhservice.get("port", "8080") }}!{{ fhservice.get("ping_endpoint", "/sys/info/ping") }}
        use generic-service
 
-       notes This server cannot access {{ fhservice }}, check it is running and that this server is able to talk to it on port 8080
+       notes This server cannot access {{ fhservice['name'] }}, check it is running and that this server is able to talk to it on port 8080
        contact_groups rhmapadmins
 }
 {% endfor %}
 
-{% for fhservice in fh_services_health %}
+{% for fhservice in fh_services if 'health' in fhservice['checks'] %}
 define service {
-       service_description {{ fhservice }}::Health
+       service_description {{ fhservice['name'] }}::Health
        hosts {{ rhmap_router_dns }}
-       check_command check_fh_component_http_health!{{ fhservice }}
+       check_command check_fh_component_health!{{ fhservice['name'] }}!{{ fhservice.get("port", "8080") }}!{{ fhservice.get("health_endpoint", "/sys/info/health") }}
        use generic-service
 
-       notes This server failed to get a successful response from the {{ fhservice }} health endpoint. Check the response code & body and ensure the service and its dependencies are running and configured correctly.
+       notes This server failed to get a successful response from the {{ fhservice['name'] }} health endpoint. Check the response code & body and ensure the service and its dependencies are running and configured correctly.
        contact_groups rhmapadmins
 }
 {% endfor %}
