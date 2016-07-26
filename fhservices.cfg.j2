@@ -10,6 +10,12 @@ define command {
        command_line   /opt/rhmap/nagios/plugins/fh-check-component-health -H $ARG1$ -P $ARG2$ -E $ARG3$
 }
 
+# Check that an EAP component responds to a ping over HTTP
+define command {
+       command_name   check_eap_component_health
+       command_line   $USER1$/check_http -H $ARG1$ -p $ARG2$ -u $ARG3$ -e "$ARG4$"
+}
+
 # Check for valid response from Memcached
 define command {
        command_name   check_memcached
@@ -80,6 +86,16 @@ define service {
        contact_groups rhmapadmins
 }
 {% endfor %}
+
+define service {
+      service_description keycloak:Health
+      hosts {{ rhmap_router_dns }}
+      check_command check_eap_component_health!ups!8080!/auth/admin!HTTP/1.1 302
+      use generic-service
+
+      notes This server failed to get a successful response from the Keycloak service health endpoint. Check the response code & body and ensure the service and its dependencies are running and configured correctly.
+      contact_groups rhmapadmins
+}
 
 define service {
       service_description memcached:ping
