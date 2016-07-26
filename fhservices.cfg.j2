@@ -40,6 +40,16 @@ define contactgroup {
        members            rhmapadmin
 }
 
+define hostgroup {
+       hostgroup_name core
+       alias core
+}
+
+define hostgroup {
+       hostgroup_name mbaas
+       alias mbaas
+}
+
 # Host template
 define host {
   name                    fh-component-container
@@ -61,15 +71,15 @@ define host {
        use fh-component-container
        address {{ rhmap_router_dns }}
        host_name {{ rhmap_router_dns }}
+       hostgroups {{ rhmap_hostgroups }}
 }
 
 {% for fhservice in fh_services if 'ping' in fhservice['checks'] %}
 define service {
-       service_description {{ fhservice['name']}}::Ping
-       hosts {{ rhmap_router_dns }}
+       service_description {{ fhservice['name'] }}::Ping
        check_command check_fh_component_http_ping!{{ fhservice['name'] }}!{{ fhservice.get("port", "8080") }}!{{ fhservice.get("ping_endpoint", "/sys/info/ping") }}
        use generic-service
-
+       hostgroup_name {{ ",".join(fhservice['hostgroups']) }}
        notes This server cannot access {{ fhservice['name'] }}, check it is running and that this server is able to talk to it on port 8080
        contact_groups rhmapadmins
 }
@@ -78,10 +88,9 @@ define service {
 {% for fhservice in fh_services if 'health' in fhservice['checks'] %}
 define service {
        service_description {{ fhservice['name'] }}::Health
-       hosts {{ rhmap_router_dns }}
        check_command check_fh_component_health!{{ fhservice['name'] }}!{{ fhservice.get("port", "8080") }}!{{ fhservice.get("health_endpoint", "/sys/info/health") }}
        use generic-service
-
+       hostgroup_name {{ ",".join(fhservice['hostgroups']) }}
        notes This server failed to get a successful response from the {{ fhservice['name'] }} health endpoint. Check the response code & body and ensure the service and its dependencies are running and configured correctly.
        contact_groups rhmapadmins
 }
@@ -89,20 +98,18 @@ define service {
 
 define service {
       service_description keycloak:Health
-      hosts {{ rhmap_router_dns }}
       check_command check_eap_component_health!ups!8080!/auth/admin!HTTP/1.1 302
       use generic-service
-
+      hostgroup_name core
       notes This server failed to get a successful response from the Keycloak service health endpoint. Check the response code & body and ensure the service and its dependencies are running and configured correctly.
       contact_groups rhmapadmins
 }
 
 define service {
       service_description memcached:ping
-      hosts {{ rhmap_router_dns }}
       check_command check_memcached!11211
       use generic-service
-
+      hostgroup_name core
       notes This should be able to communicate with memcached on port 11211 and cannot. Check it is running and this server can communicate with it on that port.
       contact_groups rhmapadmins
 }
