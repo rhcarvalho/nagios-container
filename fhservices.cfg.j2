@@ -71,7 +71,7 @@ define host {
        use fh-component-container
        address {{ rhmap_router_dns }}
        host_name {{ rhmap_router_dns }}
-       hostgroups core
+       hostgroups {{ rhmap_hostgroups }}
 }
 
 {% for fhservice in fh_services if 'ping' in fhservice['checks'] %}
