@@ -17,16 +17,16 @@ RUN yum install -y epel-release && \
            -e 's|<Directory "/var/www">|<Directory "/usr/share/nagios/html">|' \
            /etc/httpd/conf/httpd.conf && \
     touch /supervisord.log /supervisord.pid && \
-    mkdir -p /var/log/nagios/archives /var/log/nagios/rw/ /var/log/nagios/spool/checkresults /opt/rhmap/nagios/plugins/ && \
+    mkdir -p /var/log/nagios/archives /var/log/nagios/rw/ /var/log/nagios/spool/checkresults /opt/rhmap/nagios/plugins/lib && \
     chmod -R 777 /supervisord.log /supervisord.pid /var/log/nagios \
                  /etc/httpd /etc/passwd /var/log /etc/nagios /usr/lib64/nagios \
                  /var/spool/nagios /run /usr/share/httpd /usr/share/nagios && \
     sed -i -e 's|cfg_file=/etc/nagios/objects/localhost.cfg||' /etc/nagios/nagios.cfg
 
-ADD supervisord.conf /etc/supervisord.conf
-ADD make-nagios-fhservices-cfg make-nagios-commands-cfg fhservices.cfg.j2 commands.cfg.j2 /opt/rhmap/
-ADD plugins/default/* plugins/core/* /opt/rhmap/nagios/plugins/
+COPY supervisord.conf /etc/supervisord.conf
+COPY make-nagios-fhservices-cfg make-nagios-commands-cfg fhservices.cfg.j2 commands.cfg.j2 /opt/rhmap/
+COPY plugins/default/ /opt/rhmap/nagios/plugins/
 RUN chmod -R 755 /opt/rhmap/nagios/plugins/
-ADD start /start
+COPY start /start
 
 CMD ["/start"]
