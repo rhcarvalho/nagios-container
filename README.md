@@ -16,7 +16,7 @@ Run tests:
 
 ```
 python -m unittest discover -s plugins/default
-````
+```
 
 Style Guide:
 
