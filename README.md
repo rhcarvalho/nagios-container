@@ -34,7 +34,7 @@ More info: https://pypi.python.org/pypi/flake8.
 To format code:
 
 ```
-autopep8 --in-place --aggressive --aggressive plugins/default/**/*.py
+find . -name '*.py' -print0 | xargs -0 autopep8 --in-place --aggressive --aggressive
 ```
 
 More info: https://pypi.python.org/pypi/autopep8.
