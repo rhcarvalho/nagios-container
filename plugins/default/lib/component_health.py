@@ -1,7 +1,8 @@
 #!/usr/bin/env python
-import sys
-import json
 import argparse
+import json
+import sys
+import traceback
 import urllib2
 
 import nagios
@@ -74,22 +75,23 @@ def report(summary, test_results):
         print 'Test: %s - Status: %s - Details: %s' % (test['description'], test['test_status'], test['result'])
 
 
-def main():
-    args = generate_parser().parse_args()
+def check(host, port, endpoint):
     try:
-        host = args.host
-        port = args.port
-        endpoint = args.endpoint
         response = do_request(host, port, endpoint)
         nagios_status, test_summary, test_results = parse_response(response)
         report(test_summary, test_results)
     except RequestError as error:
         print error.message
         nagios_status = nagios.CRIT
-    except:
-        print "Unexpected error: %s" % (sys.exc_info()[0])
-        nagios_status = nagios.UNKNOWN
-    sys.exit(nagios_status)
+    return nagios_status
+
 
 if __name__ == "__main__":
-    main()
+    args = generate_parser().parse_args()
+    code = nagios.UNKNOWN
+    try:
+        code = check(args.host, args.port, args.endpoint)
+    except:
+        traceback.print_exc()
+    finally:
+        sys.exit(code)
