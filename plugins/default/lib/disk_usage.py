@@ -62,6 +62,9 @@ def analize(pod, disks, warning_threshold, critical_threshold):
 
 
 def report(results):
+    if not results:
+        return nagios.UNKNOWN
+
     unique_statuses = Counter(
         disk_status
         for pod, mount, space_usage, inode_usage, disk_status in results
@@ -115,5 +118,3 @@ if __name__ == "__main__":
         traceback.print_exc()
     finally:
         sys.exit(code)
-
-# TODO: what if nothing is checked? (empty output from df, etc)
