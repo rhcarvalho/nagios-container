@@ -11,7 +11,9 @@ import nagios
 
 check_disk_cmd = ("df", "--output=pcent,ipcent,target")
 # Example output:
-# /etc/hosts      19%    8%
+# Use% IUse% Mounted on
+#   1%    1% /
+#  20%    8% /etc/hosts
 check_disk_output_pattern = re.compile(r"\s*(\d+)%\s+(\d+)%\s+(.+)$")
 
 
