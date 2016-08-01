@@ -121,6 +121,7 @@ define service {
 
 define service {
        service_description Storage::Pod::Disk Usage
+       # REVIEW: is this being applied to every pod/container? How does it work?
        hosts {{ rhmap_router_dns }}
        check_command check_pod_disk_usage!80!90
        use generic-service
