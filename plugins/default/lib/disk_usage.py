@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import re
 import sys
-import json
 import argparse
 from subprocess import CalledProcessError
 from collections import Counter
@@ -54,7 +53,10 @@ def analize(pod, disks, warning_threshold, critical_threshold):
 
 
 def report(results):
-    unique_statuses = Counter(disk_status for pod, mount, space_usage, inode_usage, disk_status in results)
+    unique_statuses = Counter(
+        disk_status
+        for pod, mount, space_usage, inode_usage, disk_status in results
+    )
 
     ret = max(unique_statuses)
 

@@ -10,8 +10,9 @@ def _get_running_pod_names(oc, project):
     # Manually filter Running pods because of a bug in `oc get`, see:
     # https://github.com/kubernetes/kubernetes/issues/29115
     # return oc("-n", project, "get", "pods", "--show-all=false", "-o", "name")
-    pods = json.loads(oc("-n", project, "get", "pods", "--show-all=false", "-o", "json"))["items"]
-    return [p["metadata"]["name"] for p in pods if p["status"]["phase"] == "Running"]
+    pods = json.loads(oc("-n", project, "get", "pods", "-o", "json"))["items"]
+    return [p["metadata"]["name"]
+            for p in pods if p["status"]["phase"] == "Running"]
 
 
 def get_running_pod_names(project):
@@ -27,6 +28,6 @@ def exec_in_pods(project, pods, cmd):
 
 
 def get_project():
-    with open('/var/run/secrets/kubernetes.io/serviceaccount/namespace', 'r') as nsfile:
-        data = nsfile.read().rstrip("\n")
+    with open("/var/run/secrets/kubernetes.io/serviceaccount/namespace") as f:
+        data = f.read().rstrip("\n")
     return data
