@@ -75,8 +75,8 @@ def report(summary, test_results):
 
 
 def main():
+    args = generate_parser().parse_args()
     try:
-        args = generate_parser().parse_args()
         host = args.host
         port = args.port
         endpoint = args.endpoint
