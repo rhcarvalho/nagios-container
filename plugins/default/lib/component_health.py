@@ -76,13 +76,9 @@ def report(summary, test_results):
 
 
 def check(host, port, endpoint):
-    try:
-        response = do_request(host, port, endpoint)
-        nagios_status, test_summary, test_results = parse_response(response)
-        report(test_summary, test_results)
-    except RequestError as error:
-        print error.message
-        nagios_status = nagios.CRIT
+    response = do_request(host, port, endpoint)
+    nagios_status, test_summary, test_results = parse_response(response)
+    report(test_summary, test_results)
     return nagios_status
 
 
