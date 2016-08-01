@@ -62,6 +62,7 @@ def analize(pod, disks, warning_threshold, critical_threshold):
 
 
 def report(results):
+    # REVIEW: is nagios.UNKNOWN the best here?
     if not results:
         return nagios.UNKNOWN
 
