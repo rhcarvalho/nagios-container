@@ -1,8 +1,8 @@
 #!/usr/bin/env python
+import argparse
 import re
 import sys
-import argparse
-from subprocess import CalledProcessError
+import traceback
 from collections import Counter
 
 import openshift
@@ -89,13 +89,10 @@ def report(results):
     return ret
 
 
-def main():
-    args = generate_parser().parse_args()
-    warn = args.warn
-    crit = args.crit
-
+def check(warn, crit):
     if crit < warn:
-        raise ValueError("Critical threshold lower than Warning threshold")
+        msg = "critical threshold cannot be lower than warning threshold: %d < %d"
+        raise ValueError(msg % (crit, warn))
 
     project = openshift.get_project()
 
@@ -108,14 +105,15 @@ def main():
 
     return report(results)
 
+
 if __name__ == "__main__":
+    args = generate_parser().parse_args()
+    code = nagios.UNKNOWN
     try:
-        main()
-    except CalledProcessError:
-        pass
-    except KeyError:
-        pass
+        code = check(args.warn, args.crit)
     except:
-        sys.exit(nagios.UNKNOWN)
+        traceback.print_exc()
+    finally:
+        sys.exit(code)
 
 # TODO: what if nothing is checked? (empty output from df, etc)
