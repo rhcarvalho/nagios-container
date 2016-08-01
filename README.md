@@ -6,34 +6,35 @@ Nagios server in a Docker container for RHMAP.
 
 ## Development
 
-Install dependencies:
-```
-pip install pep8
-pip install autopep8
-```
-
-Run tests:
+### Running tests
 
 ```
 python -m unittest discover -s plugins/default
-````
-
-Style Guide:
-
-All python modules should conform to the PEP8 style guide https://www.python.org/dev/peps/pep-0008/
-
-To verify:
-
-```
-pep8 plugins/ --show-source
 ```
 
-More info https://pypi.python.org/pypi/pep8
+### Style Guide and common problems
 
-To format code:
+We use tools to enforce the [PEP8](https://www.python.org/dev/peps/pep-0008/)
+style guide and prevent common problems on all Python code in this repository.
+
+When developing the project, you'll need to install the dependencies:
 
 ```
-autopep8 --in-place --aggressive --aggressive plugins/default/**/*.py
+pip install flake8 autopep8
 ```
 
-More info https://pypi.python.org/pypi/autopep8
+Use [flake8](https://pypi.python.org/pypi/flake8) to verify that the code
+conforms to the style guide, and is free of common errors:
+
+```
+flake8 --show-source
+```
+
+Automatically format source code using
+[autopep8](https://pypi.python.org/pypi/autopep8):
+
+```
+find . -name '*.py' -print0 | xargs -0 autopep8 --in-place --aggressive --aggressive
+```
+
+You may integrate `flake8` and `autopep8` with your code editor.

@@ -42,7 +42,10 @@ class TestParseDfLines(unittest.TestCase):
 
     def runTest(self):
         self.assertEqual(parse_df_lines(
-            "Use% IUse% Mounted on\n  1%    1% /\n 19%    8% /etc/hosts\n  1%    1% /run/secrets/kubernetes.io/serviceaccount"),
+            "Use% IUse% Mounted on\n"
+            "  1%    1% /\n"
+            " 19%    8% /etc/hosts\n"
+            "  1%    1% /run/secrets/kubernetes.io/serviceaccount"),
             [("/", 1, 1), ("/etc/hosts", 19, 8), ("/run/secrets/kubernetes.io/serviceaccount", 1, 1)])
 
 
