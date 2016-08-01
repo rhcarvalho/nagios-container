@@ -82,6 +82,8 @@ def check(host, port, endpoint):
         report(test_summary, test_results)
     except RequestError as error:
         print error.message
+        # REVIEW: shouldn't this be nagios.UNKNOWN? If the request failed, we
+        # "don't know" if the component is healthy or not.
         nagios_status = nagios.CRIT
     return nagios_status
 
