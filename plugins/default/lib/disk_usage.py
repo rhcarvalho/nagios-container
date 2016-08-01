@@ -9,21 +9,28 @@ import openshift
 import nagios
 
 
+def generate_parser():
+    parser = argparse.ArgumentParser(
+        description="Checks the disk usage (blocks and inodes)",
+    )
+    parser.add_argument(
+        "-w", "--warn", type=int, required=True,
+        help="set warning threshold of disk usage (%% of blocks or inodes)",
+    )
+    parser.add_argument(
+        "-c", "--crit", type=int, required=True,
+        help="set critical threshold of disk usage (%% of blocks or inodes), "
+             "must be higher than or equal the warning threshold",
+    )
+    return parser
+
+
 check_disk_cmd = ("df", "--output=pcent,ipcent,target")
 # Example output:
 # Use% IUse% Mounted on
 #   1%    1% /
 #  20%    8% /etc/hosts
 check_disk_output_pattern = re.compile(r"\s*(\d+)%\s+(\d+)%\s+(.+)$")
-
-
-def generate_parser():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-w", "--warn", type=int, action="store",
-                        required=True, help="Warning Threshold")
-    parser.add_argument('-c', '--crit', type=int, action="store",
-                        required=True, help="Critical Threshold")
-    return parser
 
 
 def parse_df_line(line):

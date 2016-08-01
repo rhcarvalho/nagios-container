@@ -7,34 +7,29 @@ import urllib2
 import nagios
 
 
+def generate_parser():
+    parser = argparse.ArgumentParser(
+        description="Checks the health endpoint of an RHMAP component",
+    )
+    parser.add_argument(
+        "-H", "--host", required=True,
+        help="host name of the component",
+    )
+    parser.add_argument(
+        "-P", "--port", default="8080",
+        help="port number of the component (default: %(default)s)",
+    )
+    parser.add_argument(
+        "-E", "--endpoint", default="/sys/info/health",
+        help="health endpoint (default: %(default)s)",
+    )
+    return parser
+
+
 class RequestError(Exception):
 
     def __init__(self, message):
         self.message = message
-
-
-def generate_parser():
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-H",
-        "--host",
-        action="store",
-        required=True,
-        help="Host")
-    parser.add_argument(
-        '-P',
-        '--port',
-        action="store",
-        required=True,
-        help="Port")
-    parser.add_argument(
-        "-E",
-        "--endpoint",
-        action="store",
-        required=False,
-        help="Endpoint",
-        default="/sys/info/health")
-    return parser
 
 
 def do_request(host, port, endpoint):
