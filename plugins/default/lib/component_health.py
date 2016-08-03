@@ -32,6 +32,9 @@ class RequestError(Exception):
     def __init__(self, message):
         self.message = message
 
+    def __str__(self):
+        return self.message
+
 
 def do_request(host, port, endpoint):
     url = 'http://%s:%s%s' % (host, port, endpoint)
