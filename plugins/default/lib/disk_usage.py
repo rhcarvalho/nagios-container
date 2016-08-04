@@ -1,27 +1,36 @@
 #!/usr/bin/env python
+import argparse
 import re
 import sys
-import argparse
-from subprocess import CalledProcessError
+import traceback
 from collections import Counter
 
 import openshift
 import nagios
 
 
+def generate_parser():
+    parser = argparse.ArgumentParser(
+        description="Checks the disk usage (blocks and inodes)",
+    )
+    parser.add_argument(
+        "-w", "--warn", type=int, required=True,
+        help="set warning threshold of disk usage (%% of blocks or inodes)",
+    )
+    parser.add_argument(
+        "-c", "--crit", type=int, required=True,
+        help="set critical threshold of disk usage (%% of blocks or inodes), "
+             "must be higher than or equal the warning threshold",
+    )
+    return parser
+
+
 check_disk_cmd = ("df", "--output=pcent,ipcent,target")
 # Example output:
-# /etc/hosts      19%    8%
+# Use% IUse% Mounted on
+#   1%    1% /
+#  20%    8% /etc/hosts
 check_disk_output_pattern = re.compile(r"\s*(\d+)%\s+(\d+)%\s+(.+)$")
-
-
-def generate_parser():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-w", "--warn", type=int, action="store",
-                        required=True, help="Warning Threshold")
-    parser.add_argument('-c', '--crit', type=int, action="store",
-                        required=True, help="Critical Threshold")
-    return parser
 
 
 def parse_df_line(line):
@@ -53,6 +62,9 @@ def analize(pod, disks, warning_threshold, critical_threshold):
 
 
 def report(results):
+    if not results:
+        return nagios.UNKNOWN
+
     unique_statuses = Counter(
         disk_status
         for pod, mount, space_usage, inode_usage, disk_status in results
@@ -80,13 +92,10 @@ def report(results):
     return ret
 
 
-def main():
-    args = generate_parser().parse_args()
-    warn = args.warn
-    crit = args.crit
-
+def check(warn, crit):
     if crit < warn:
-        raise ValueError("Critical threshold lower than Warning threshold")
+        msg = "critical threshold cannot be lower than warning threshold: %d < %d"
+        raise ValueError(msg % (crit, warn))
 
     project = openshift.get_project()
 
@@ -99,14 +108,13 @@ def main():
 
     return report(results)
 
-if __name__ == "__main__":
-    try:
-        main()
-    except CalledProcessError:
-        pass
-    except KeyError:
-        pass
-    except:
-        sys.exit(nagios.UNKNOWN)
 
-# TODO: what if nothing is checked? (empty output from df, etc)
+if __name__ == "__main__":
+    args = generate_parser().parse_args()
+    code = nagios.UNKNOWN
+    try:
+        code = check(args.warn, args.crit)
+    except:
+        traceback.print_exc()
+    finally:
+        sys.exit(code)

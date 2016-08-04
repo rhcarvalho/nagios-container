@@ -1,10 +1,30 @@
 #!/usr/bin/env python
-import sys
-import json
 import argparse
+import json
+import sys
+import traceback
 import urllib2
 
 import nagios
+
+
+def generate_parser():
+    parser = argparse.ArgumentParser(
+        description="Checks the health endpoint of an RHMAP component",
+    )
+    parser.add_argument(
+        "-H", "--host", required=True,
+        help="host name of the component",
+    )
+    parser.add_argument(
+        "-P", "--port", default="8080",
+        help="port number of the component (default: %(default)s)",
+    )
+    parser.add_argument(
+        "-E", "--endpoint", default="/sys/info/health",
+        help="health endpoint (default: %(default)s)",
+    )
+    return parser
 
 
 class RequestError(Exception):
@@ -12,29 +32,8 @@ class RequestError(Exception):
     def __init__(self, message):
         self.message = message
 
-
-def generate_parser():
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-H",
-        "--host",
-        action="store",
-        required=True,
-        help="Host")
-    parser.add_argument(
-        '-P',
-        '--port',
-        action="store",
-        required=True,
-        help="Port")
-    parser.add_argument(
-        "-E",
-        "--endpoint",
-        action="store",
-        required=False,
-        help="Endpoint",
-        default="/sys/info/health")
-    return parser
+    def __str__(self):
+        return self.message
 
 
 def do_request(host, port, endpoint):
@@ -79,22 +78,19 @@ def report(summary, test_results):
         print 'Test: %s - Status: %s - Details: %s' % (test['description'], test['test_status'], test['result'])
 
 
-def main():
-    try:
-        args = generate_parser().parse_args()
-        host = args.host
-        port = args.port
-        endpoint = args.endpoint
-        response = do_request(host, port, endpoint)
-        nagios_status, test_summary, test_results = parse_response(response)
-        report(test_summary, test_results)
-    except RequestError as error:
-        print error.message
-        nagios_status = nagios.CRIT
-    except:
-        print "Unexpected error: %s" % (sys.exc_info()[0])
-        nagios_status = nagios.UNKNOWN
-    sys.exit(nagios_status)
+def check(host, port, endpoint):
+    response = do_request(host, port, endpoint)
+    nagios_status, test_summary, test_results = parse_response(response)
+    report(test_summary, test_results)
+    return nagios_status
+
 
 if __name__ == "__main__":
-    main()
+    args = generate_parser().parse_args()
+    code = nagios.UNKNOWN
+    try:
+        code = check(args.host, args.port, args.endpoint)
+    except:
+        traceback.print_exc()
+    finally:
+        sys.exit(code)
