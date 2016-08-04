@@ -34,7 +34,7 @@ define command {
 
 define command {
   command_name   check_mongodb
-  command_line   /opt/rhmap/nagios/plugins/mongodb-health -s $ARG1$
+  command_line   /opt/rhmap/nagios/plugins/mongodb-health --container $ARG1$
 }
 
 define contact {
@@ -135,7 +135,7 @@ define service {
 
 define service {
        service_description Database::MongoDB::Health
-       check_command check_mongodb!mongodb-service-1
+       check_command check_mongodb!mongodb,mongodb-service
        use generic-service
        hostgroup_name core,mbaas
        notes The mongodb replica set may not be functioning properly.  There should be one and only one primary member and zero or more secondary members

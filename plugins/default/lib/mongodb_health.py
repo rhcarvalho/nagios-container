@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import argparse
+import json
 import sys
 import traceback
 from collections import Counter
@@ -35,21 +36,22 @@ def generate_parser():
         description="Checks the status of a MongoDB replica set",
     )
     parser.add_argument(
-        "-s", "--service", required=True,
-        help='service name for MongoDB pods (e.g.: "mongodb-service-1")',
+        "-c", "--containers", required=True,
+        help='container name(s) for MongoDB pods separated by , (e.g.: "mongodb,mongodb-service")',
     )
     return parser
 
 
 check_mongodb_cmd = (
     "bash", "-c",
-    'mongo 127.0.0.1/admin -u "admin" -p "$MONGODB_ADMIN_PASSWORD" --eval="rs.status().myState" --quiet'
+    'mongo 127.0.0.1/admin -u admin -p "$MONGODB_ADMIN_PASSWORD" --eval="print(JSON.stringify((rs.status())))" --quiet'
 )
 
 
 def parse_mongo_result(output):
     try:
-        return int(output.rstrip("\n"))
+        js = json.loads(output)
+        return int(js["myState"])
     except:
         return None
 
@@ -104,12 +106,11 @@ def report(pods, rs_statuses, nag_statuses):
     return ret
 
 
-def check(service):
+def check(containers):
     project = openshift.get_project()
 
-    selector = openshift.get_service_selectors(project, service)
+    pods = openshift.get_running_pod_names(project, container_names=containers.split(','))
 
-    pods = openshift.get_running_pod_names(project, selector=selector)
     rs_statuses = map(parse_mongo_result, openshift.exec_in_pods(project, pods, check_mongodb_cmd))
     nag_statuses = map(analize, rs_statuses)
 
@@ -119,8 +120,10 @@ if __name__ == "__main__":
     args = generate_parser().parse_args()
     code = nagios.UNKNOWN
     try:
-        code = check(args.service)
+        code = check(args.containers)
     except:
         traceback.print_exc()
     finally:
         sys.exit(code)
+
+# TODO: add logic to validate the health of all members in the json returned for each mongo
