@@ -11,6 +11,7 @@ fh_services = [
     {'name': 'fh-supercore', 'checks': ['ping', 'health'], 'hostgroups': ['core']},
     {'name': 'fh-aaa', 'checks': ['ping', 'health'], 'hostgroups': ['core']},
     {'name': 'fh-appstore', 'checks': ['ping', 'health'], 'hostgroups': ['core']},
+    {'name': 'fh-scm', 'checks': ['ping', 'health'], 'hostgroups': ['core']},
     {'name': 'fh-mbaas', 'checks': ['ping', 'health'], 'hostgroups': ['mbaas']},
     {'name': 'fh-statsd', 'checks': ['ping'], 'hostgroups': ['mbaas']},
     {'name': 'millicore', 'checks': ['health'], 'health_endpoint': '/box/api/health', 'hostgroups': ['core']},
